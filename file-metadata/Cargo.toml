@@ -13,4 +13,4 @@ libc = "0.2.58"
 core-foundation-sys = "0.6.2"
 core-foundation = "0.6.4"
 bitflags = "1.1.0"
-file-metadata-mditem-macros = "0.0.1"
+file-metadata-mditem-macros = { path = "../file-metadata-mditem-macros" }
