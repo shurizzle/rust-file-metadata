@@ -6,7 +6,7 @@ use core_foundation::string::{CFString, CFStringRef};
 use core_foundation::array::{CFArray, CFArrayRef};
 use libc::{c_void, c_ulong};
 
-// use crate::mditem::MDItemRef;
+use crate::mditem::MDItem;
 
 pub type OptionBits = u32;
 pub type CFOptionFlags = c_ulong;
@@ -113,9 +113,9 @@ impl MDQuery {
     }
 
     #[inline]
-    pub fn get<'a, T>(&'a self, idx: CFIndex) -> Option<ItemRef<'a, T>> where T: FromVoid {
+    pub fn get<'a>(&'a self, idx: CFIndex) -> Option<ItemRef<'a, MDItem>> {
         if idx < self.len() {
-            Some(unsafe { T::from_void(MDQueryGetResultAtIndex(self.0, idx) as *const c_void) })
+            Some(unsafe { MDItem::from_void(MDQueryGetResultAtIndex(self.0, idx)) })
         } else {
             None
         }
@@ -138,6 +138,7 @@ impl std::fmt::Debug for MDQuery {
 mod tests {
     use core_foundation::string::CFString;
     use crate::mdquery::*;
+    use crate::mditem::kMDItemURL;
 
     #[test]
     fn it_works() {
@@ -148,5 +149,7 @@ mod tests {
         let query = query.unwrap();
         query.execute(MDQueryOptionFlags::kMDQuerySynchronous);
         println!("{}", query.len());
+        println!("{:#?}", query.get(0).unwrap().attributes().iter().map(|v|v.to_string()).collect::<Vec<String>>());
+        println!("{:#?}", query.get(0).unwrap().get::<CFString>(CFString::new("kMDItemCFBundleIdentifier").as_concrete_TypeRef()));
     }
 }

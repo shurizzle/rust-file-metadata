@@ -1,5 +1,3 @@
-#![feature(concat_idents)]
-
 extern crate libc;
 extern crate core_foundation_sys;
 #[macro_use]

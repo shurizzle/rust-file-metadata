@@ -4,14 +4,8 @@ version = "0.1.0"
 authors = ["Domenico Shura <shura1991@gmail.com>"]
 edition = "2018"
 
-[lib]
-proc-macro = true
-
 [dependencies]
 libc = "0.2.58"
 core-foundation-sys = "0.6.2"
 core-foundation = "0.6.4"
 bitflags = "1.1.0"
-syn = "0.15.35"
-quote = "0.6.12"
-proc-macro2 = "0.4.30"
