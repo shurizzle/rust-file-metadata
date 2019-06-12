@@ -1,5 +1,9 @@
 [package]
 name = "file-metadata-mditem-macros"
+description = "Macros for file-metadata package"
+homepage = "https://github.com/shurizzle/rust-file-metadata"
+repository = "https://github.com/shurizzle/rust-file-metadata"
+license-file = "../LICENSE"
 version = "0.0.1"
 authors = ["Domenico Shura <shura1991@gmail.com>"]
 edition = "2018"
