@@ -17,9 +17,9 @@ pub type MDQueryRef = *const __MDQuery;
 
 bitflags! {
     pub struct MDQueryOptionFlags: CFOptionFlags {
-        const kMDQuerySynchronous = 1;
-        const kMDQueryWantsUpdates = 4;
-        const kMDQueryAllowFSTranslation = 8;
+        const SYNC = 1;
+        const WANTS_UPDATES = 4;
+        const ALLOW_FS_TRANSLATION = 8;
     }
 }
 
@@ -128,7 +128,7 @@ impl MDQuery {
     }
 }
 
-impl std::fmt::Debug for MDQuery {
+impl ::std::fmt::Debug for MDQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "\"{:?}\"", self.query_string())
     }
@@ -138,18 +138,16 @@ impl std::fmt::Debug for MDQuery {
 mod tests {
     use core_foundation::string::CFString;
     use crate::mdquery::*;
-    use crate::mditem::kMDItemURL;
+    use crate::mditem::attributes::Path;
 
     #[test]
     fn it_works() {
         let query_string = "kMDItemContentTypeTree == \"com.apple.application\"c";
         let query_cfstring = CFString::new(query_string);
-        let query = MDQuery::new(query_cfstring, None, None);
-        assert_ne!(query, None);
-        let query = query.unwrap();
-        query.execute(MDQueryOptionFlags::kMDQuerySynchronous);
+        let query = MDQuery::new(query_cfstring, None, None).unwrap();
+        query.execute(MDQueryOptionFlags::SYNC | MDQueryOptionFlags::ALLOW_FS_TRANSLATION);
         println!("{}", query.len());
         println!("{:#?}", query.get(0).unwrap().attributes().iter().map(|v|v.to_string()).collect::<Vec<String>>());
-        println!("{:#?}", query.get(0).unwrap().get::<CFString>(CFString::new("kMDItemCFBundleIdentifier").as_concrete_TypeRef()));
+        println!("{:#?}", query.get(0).unwrap().get(Path));
     }
 }

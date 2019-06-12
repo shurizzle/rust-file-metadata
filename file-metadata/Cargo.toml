@@ -1,0 +1,12 @@
+[package]
+name = "file-metadata"
+version = "0.0.1"
+authors = ["Domenico Shura <shura1991@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+libc = "0.2.58"
+core-foundation-sys = "0.6.2"
+core-foundation = "0.6.4"
+bitflags = "1.1.0"
+file-metadata-mditem-macros = { path = "../file-metadata-mditem-macros" }

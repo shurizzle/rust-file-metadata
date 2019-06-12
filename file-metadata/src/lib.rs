@@ -1,3 +1,5 @@
+#![crate_name = "file_metadata"]
+
 extern crate libc;
 extern crate core_foundation_sys;
 #[macro_use]
