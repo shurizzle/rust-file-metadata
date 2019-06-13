@@ -73,6 +73,32 @@ extern "C" {
     fn MDQueryGetTypeID() -> CFTypeID;
 }
 
+pub struct MDQueryIterator<'a> {
+    query: &'a MDQuery,
+    index: CFIndex,
+    len: CFIndex,
+}
+
+impl<'a> Iterator for MDQueryIterator<'a> {
+    type Item = ItemRef<'a, MDItem>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let value = unsafe { self.query.get_unchecked(self.index) };
+            self.index += 1;
+            Some(value)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a> ExactSizeIterator for MDQueryIterator<'a> {
+    fn len(&self) -> usize {
+        (self.query.len() - self.index) as usize
+    }
+}
+
 declare_TCFType!{
     MDQuery, MDQueryRef
 }
@@ -94,18 +120,21 @@ impl MDQuery {
         }
     }
 
+    #[inline]
     pub fn execute(&self, flags: MDQueryOptionFlags) -> bool {
         unsafe {
             MDQueryExecute(self.0, flags.bits())
         }
     }
 
+    #[inline]
     pub fn stop(&self) {
         unsafe {
             MDQueryStop(self.0);
         }
     }
 
+    #[inline]
     pub fn len(&self) -> CFIndex {
         unsafe {
             MDQueryGetResultCount(self.0)
@@ -113,14 +142,29 @@ impl MDQuery {
     }
 
     #[inline]
+    pub(crate) unsafe fn get_unchecked<'a>(&'a self, idx: CFIndex) -> ItemRef<'a, MDItem> {
+        MDItem::from_void(MDQueryGetResultAtIndex(self.0, idx))
+    }
+
+    #[inline]
     pub fn get<'a>(&'a self, idx: CFIndex) -> Option<ItemRef<'a, MDItem>> {
         if idx < self.len() {
-            Some(unsafe { MDItem::from_void(MDQueryGetResultAtIndex(self.0, idx)) })
+            Some(unsafe { self.get_unchecked(idx) })
         } else {
             None
         }
     }
 
+    #[inline]
+    pub fn iter<'a>(&'a self) -> MDQueryIterator<'a> {
+        MDQueryIterator {
+            query: self,
+            index: 0,
+            len: self.len(),
+        }
+    }
+
+    #[inline]
     pub fn query_string(&self) -> CFString {
         unsafe {
             TCFType::wrap_under_create_rule(MDQueryCopyQueryString(self.0))
@@ -146,8 +190,6 @@ mod tests {
         let query_cfstring = CFString::new(query_string);
         let query = MDQuery::new(query_cfstring, None, None).unwrap();
         query.execute(MDQueryOptionFlags::SYNC | MDQueryOptionFlags::ALLOW_FS_TRANSLATION);
-        println!("{}", query.len());
-        println!("{:#?}", query.get(0).unwrap().attributes().iter().map(|v|v.to_string()).collect::<Vec<String>>());
-        println!("{:#?}", query.get(0).unwrap().get(Path));
+        println!("{:#?}", query.iter().map(|v| v.get(Path).unwrap()).collect::<Vec<_>>());
     }
 }
