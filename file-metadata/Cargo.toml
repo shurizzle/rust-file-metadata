@@ -1,6 +1,6 @@
 [package]
 name = "file-metadata"
-version = "0.0.2"
+version = "0.0.3"
 description = "An incomplete wrap around File Metadata of Core Services framework (macOS)."
 homepage = "https://github.com/shurizzle/rust-file-metadata"
 repository = "https://github.com/shurizzle/rust-file-metadata"
